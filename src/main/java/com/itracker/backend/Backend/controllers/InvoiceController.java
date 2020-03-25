@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.itracker.backend.Backend.entities.invoice.InvoiceEntity;
@@ -108,7 +109,7 @@ public class InvoiceController
     }
     
     @GetMapping ( "/first" )
-    public List< InvoiceEntity > first ( @PathVariable Long number )
+    public List< InvoiceEntity > first ( @RequestParam Integer number )
     {
         return repo
             .findAll()
@@ -118,7 +119,7 @@ public class InvoiceController
     }
     
     @GetMapping ( "/first/view" )
-    public List< InvoiceView > firstViews ( @PathVariable Long number )
+    public List< InvoiceView > firstViews ( @RequestParam Integer number )
     {
         return repo
             .findAll()
@@ -128,10 +129,10 @@ public class InvoiceController
             .collect( Collectors.toList() );
     }
     
-    @GetMapping ( "/first" )
+    @GetMapping ( "/firstn" )
     public List< InvoiceEntity > first (
-        @NonNull @PathVariable Long after ,
-        @NonNull @PathVariable Long number
+        @NonNull @RequestParam Integer after ,
+        @NonNull @RequestParam Integer number
     )
     {
         return repo
@@ -142,10 +143,10 @@ public class InvoiceController
             .collect( Collectors.toList() );
     }
     
-    @GetMapping ( "/first/view" )
+    @GetMapping ( "/firstn/view" )
     public List< InvoiceView > firstViews (
-        @NonNull @PathVariable Long after ,
-        @NonNull @PathVariable Long number
+        @NonNull @RequestParam Integer after ,
+        @NonNull @RequestParam Integer number
     )
     {
         return repo
