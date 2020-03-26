@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.itracker.backend.Backend.entities.invoice.InvoiceEntity;
 import com.itracker.backend.Backend.entities.invoice.view.InvoiceView;
+import com.itracker.backend.Backend.entities.payment.Payment;
 import com.itracker.backend.Backend.repositories.InvoiceRepository;
 
 
@@ -43,11 +43,11 @@ public class InvoiceController
     
     @PostMapping ( "/create" )
     public ResponseEntity< InvoiceEntity > create (
-        @RequestBody InvoiceView view
+        @RequestBody InvoiceEntity view
     )
     {
         return new ResponseEntity< InvoiceEntity >(
-            repo.save( view.toEntity() ) ,
+            repo.save( view ) ,
             HttpStatus.OK
         );
     }
@@ -80,16 +80,30 @@ public class InvoiceController
     @PostMapping ( "/update/{id}" )
     public ResponseEntity< InvoiceEntity > update (
         @PathVariable ( value = "id" ) Long id ,
-        @RequestBody InvoiceView view
+        @RequestBody InvoiceEntity ent
     )
     {
-        repo.deleteById( id );
-        final InvoiceEntity ent = view.toEntity();
         ent.setId( id );
         return new ResponseEntity< InvoiceEntity >(
             repo.save( ent ) ,
             HttpStatus.OK
         );
+    }
+    
+    @PostMapping ( "/payment/{id}" )
+    public ResponseEntity< InvoiceEntity > update (
+        @PathVariable ( value = "id" ) Long id ,
+        @RequestBody Payment payment
+    )
+    {
+        repo
+            .findById( id )
+            .map( x -> x.addPayment( payment ) )
+            .ifPresent( repo::save );
+        return repo
+            .findById( id )
+            .map( x -> new ResponseEntity<>( x , HttpStatus.OK ) )
+            .orElse( new ResponseEntity<>( HttpStatus.NOT_FOUND ) );
     }
     
     @GetMapping ( "/all" )
@@ -131,8 +145,8 @@ public class InvoiceController
     
     @GetMapping ( "/firstn" )
     public List< InvoiceEntity > first (
-        @NonNull @RequestParam Integer after ,
-        @NonNull @RequestParam Integer number
+        @RequestParam Integer after ,
+        @RequestParam Integer number
     )
     {
         return repo
@@ -145,8 +159,8 @@ public class InvoiceController
     
     @GetMapping ( "/firstn/view" )
     public List< InvoiceView > firstViews (
-        @NonNull @RequestParam Integer after ,
-        @NonNull @RequestParam Integer number
+        @RequestParam Integer after ,
+        @RequestParam Integer number
     )
     {
         return repo
