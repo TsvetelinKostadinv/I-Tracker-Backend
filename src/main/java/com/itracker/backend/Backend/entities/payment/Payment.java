@@ -9,6 +9,8 @@ import java.sql.Date;
 
 import javax.persistence.Embeddable;
 
+import com.itracker.backend.Backend.util.timeutil.Time;
+
 import lombok.Data;
 
 
@@ -34,6 +36,17 @@ public class Payment implements Serializable
         super();
         this.paymentDate = paymentDate;
         this.amount = amount;
+    }
+    
+    /**
+     * @param paymentDate
+     * @param amount
+     */
+    public Payment ()
+    {
+        super();
+        this.paymentDate = Time.nowSQL();
+        this.amount = 0.0;
     }
     
 }

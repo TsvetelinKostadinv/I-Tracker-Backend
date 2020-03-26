@@ -10,7 +10,6 @@ import java.sql.Date;
 import java.util.LinkedList;
 
 import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -18,6 +17,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.itracker.backend.Backend.entities.payment.Payment;
+import com.itracker.backend.Backend.util.currencies.SupportedCurrencies;
+import com.itracker.backend.Backend.util.timeutil.Time;
 
 import lombok.Data;
 
@@ -32,40 +33,50 @@ import lombok.Data;
 public class InvoiceEntity implements Serializable
 {
     
-    private static final long serialVersionUID = 1L;
+    private static final long     serialVersionUID = 1L;
     
     @Id
     @GeneratedValue ( strategy = GenerationType.AUTO )
-    private Long              id;
+    private Long                  id;
     
     @Column
-    private String            number;
+    private String                number;
     
     @Column
-    private Date              creationDate;
+    private Date                  creationDate;
     
     @Column
-    private String            fromCompany;
+    private String                fromCompany;
     
     @Column
-    private String            toCompany;
+    private String                toCompany;
     
     @Column
-    private String            goodsDescription;
+    private String                goodsDescription;
     
     @Column
-    private Double            amountToPay;
+    private Double                amountToPay;
     
     @Column
-    @Embedded
-    private LinkedList< Payment >   payments;
+    private SupportedCurrencies   currency;
+    
+    @Column
+    private LinkedList< Payment > payments;
     
     /**
-     * 
+     * DEFAULT CONSTRUCTOR WITH DEFAULT DATA
      */
     public InvoiceEntity ()
     {
         super();
+        this.number = "NOT_SPECIFIED";
+        this.creationDate = Time.nowSQL();
+        this.fromCompany = "NO_FROM_SPECIFIED";
+        this.toCompany = "NO_TO_COMPANY_SPECIFIED";
+        this.goodsDescription = "NO_GOOD_SPECIFIED";
+        this.amountToPay = 0.0;
+        this.currency = SupportedCurrencies.BGN;
+        this.payments = new LinkedList<>();
     }
     
     /**
@@ -84,7 +95,8 @@ public class InvoiceEntity implements Serializable
         String fromCompany ,
         String toCompany ,
         String goodsDescription ,
-        Double amountToPay
+        Double amountToPay ,
+        SupportedCurrencies currency
     )
     {
         super();
@@ -95,15 +107,19 @@ public class InvoiceEntity implements Serializable
         this.toCompany = toCompany;
         this.goodsDescription = goodsDescription;
         this.amountToPay = amountToPay;
+        this.currency = currency;
         this.payments = new LinkedList<>();
     }
     
     public InvoiceEntity addPayment ( Payment payment )
     {
+        if ( this.payments == null )
+        {
+            this.payments = new LinkedList< Payment >();
+        }
         this.payments.add( payment );
         return this;
     }
-
     
     /**
      * @return the id
@@ -112,16 +128,15 @@ public class InvoiceEntity implements Serializable
     {
         return id;
     }
-
     
     /**
-     * @param id the id to set
+     * @param id
+     *            the id to set
      */
     public void setId ( Long id )
     {
         this.id = id;
     }
-
     
     /**
      * @return the number
@@ -130,16 +145,15 @@ public class InvoiceEntity implements Serializable
     {
         return number;
     }
-
     
     /**
-     * @param number the number to set
+     * @param number
+     *            the number to set
      */
     public void setNumber ( String number )
     {
         this.number = number;
     }
-
     
     /**
      * @return the creationDate
@@ -148,16 +162,15 @@ public class InvoiceEntity implements Serializable
     {
         return creationDate;
     }
-
     
     /**
-     * @param creationDate the creationDate to set
+     * @param creationDate
+     *            the creationDate to set
      */
     public void setCreationDate ( Date creationDate )
     {
         this.creationDate = creationDate;
     }
-
     
     /**
      * @return the fromCompany
@@ -166,16 +179,15 @@ public class InvoiceEntity implements Serializable
     {
         return fromCompany;
     }
-
     
     /**
-     * @param fromCompany the fromCompany to set
+     * @param fromCompany
+     *            the fromCompany to set
      */
     public void setFromCompany ( String fromCompany )
     {
         this.fromCompany = fromCompany;
     }
-
     
     /**
      * @return the toCompany
@@ -184,16 +196,15 @@ public class InvoiceEntity implements Serializable
     {
         return toCompany;
     }
-
     
     /**
-     * @param toCompany the toCompany to set
+     * @param toCompany
+     *            the toCompany to set
      */
     public void setToCompany ( String toCompany )
     {
         this.toCompany = toCompany;
     }
-
     
     /**
      * @return the goodsDescription
@@ -202,16 +213,15 @@ public class InvoiceEntity implements Serializable
     {
         return goodsDescription;
     }
-
     
     /**
-     * @param goodsDescription the goodsDescription to set
+     * @param goodsDescription
+     *            the goodsDescription to set
      */
     public void setGoodsDescription ( String goodsDescription )
     {
         this.goodsDescription = goodsDescription;
     }
-
     
     /**
      * @return the amountToPay
@@ -220,16 +230,32 @@ public class InvoiceEntity implements Serializable
     {
         return amountToPay;
     }
-
     
     /**
-     * @param amountToPay the amountToPay to set
+     * @param amountToPay
+     *            the amountToPay to set
      */
     public void setAmountToPay ( Double amountToPay )
     {
         this.amountToPay = amountToPay;
     }
-
+    
+    /**
+     * @return the currency
+     */
+    public SupportedCurrencies getCurrency ()
+    {
+        return currency;
+    }
+    
+    /**
+     * @param currency
+     *            the currency to set
+     */
+    public void setCurrency ( SupportedCurrencies currency )
+    {
+        this.currency = currency;
+    }
     
     /**
      * @return the payments
@@ -238,10 +264,10 @@ public class InvoiceEntity implements Serializable
     {
         return payments;
     }
-
     
     /**
-     * @param payments the payments to set
+     * @param payments
+     *            the payments to set
      */
     public void setPayments ( LinkedList< Payment > payments )
     {

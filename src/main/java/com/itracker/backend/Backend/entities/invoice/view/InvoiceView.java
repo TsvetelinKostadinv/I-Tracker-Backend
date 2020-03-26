@@ -5,13 +5,7 @@
 package com.itracker.backend.Backend.entities.invoice.view;
 
 
-import java.sql.Date;
-import java.util.LinkedList;
-
 import com.itracker.backend.Backend.entities.invoice.InvoiceEntity;
-import com.itracker.backend.Backend.entities.payment.Payment;
-import com.itracker.backend.Backend.util.timeutil.Time;
-
 import lombok.Data;
 
 
@@ -23,30 +17,12 @@ import lombok.Data;
 public class InvoiceView
 {
     
-    public final String                number;
+    public final InvoiceEntity entity;
     
-    public final Date                  creationDate;
-    
-    public final String                fromCompany;
-    
-    public final String                toCompany;
-    
-    public final String                goodsDescription;
-    
-    public final Double                amountToPay;
-    
-    public final LinkedList< Payment > payments;
-    
-    public InvoiceView()
+    public InvoiceView ()
     {
         super();
-        this.number = "Number";
-        this.creationDate = Time.nowSQL();
-        this.fromCompany = "From";
-        this.toCompany = "To";
-        this.goodsDescription = "Goods";
-        this.amountToPay = 0.0;
-        this.payments = new LinkedList< Payment >();
+        this.entity = new InvoiceEntity();
     }
     
     /**
@@ -63,39 +39,25 @@ public class InvoiceView
     )
     {
         super();
-        this.number = entity.getNumber();
-        this.creationDate = entity.getCreationDate();
-        this.fromCompany = entity.getFromCompany();
-        this.toCompany = entity.getToCompany();
-        this.goodsDescription = entity.getGoodsDescription();
-        this.amountToPay = entity.getAmountToPay();
-        this.payments = entity.getPayments();
+        this.entity = entity;
     }
-
+    
     /**
      * @return
      */
     public InvoiceEntity toEntity ()
     {
-        return new InvoiceEntity(
-            0l ,
-            number ,
-            creationDate ,
-            fromCompany ,
-            toCompany ,
-            goodsDescription ,
-            amountToPay
-        );
+        return this.entity;
     }
     
     public Double paid ()
     {
-        return this.payments.stream().mapToDouble( x -> x.amount ).sum();
+        return this.entity.getPayments().stream().mapToDouble( x -> x.amount ).sum();
     }
     
     public Double amountToPay ()
     {
-        return this.amountToPay;
+        return this.entity.getAmountToPay();
     }
     
     public Double rest ()
@@ -105,12 +67,12 @@ public class InvoiceView
     
     public boolean checkPaid ()
     {
-        return this.amountToPay.compareTo( this.paid() ) != 1;
+        return this.entity.getAmountToPay().compareTo( this.paid() ) != 1;
     }
     
     public boolean checkOverPaid ()
     {
-        return this.amountToPay.compareTo( this.paid() ) == -1;
+        return this.entity.getAmountToPay().compareTo( this.paid() ) == -1;
     }
     
 }
